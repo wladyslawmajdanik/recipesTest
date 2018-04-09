@@ -3,6 +3,7 @@ package schibsted.recipestest.ui.activities.recipeslist;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.widget.RelativeLayout;
 
 import java.util.List;
@@ -19,18 +20,21 @@ import schibsted.recipestest.ui.activities.recipeslist.adapter.RecipesListAdapte
 
 public class RecipesListActivity extends BaseActivity implements RecipesListView {
     List<Recipes> recipesList;
+    RecipesListAdapter recipesListAdapter;
     @Inject
     public RecipesListPresenter recipesListPresenter;
     @BindView(R.id.recipes_list_container)
     RelativeLayout restaurantListContainer;
     @BindView(R.id.recipes_list_recycler)
-    RecyclerView restaurantsRecycler;
+    RecyclerView recipeRecycleView;
+    @BindView(R.id.filter_recipes)
+    SearchView filterRecipes;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_recipies_list);
+        setContentView(R.layout.activity_recipes_list);
         ButterKnife.bind(this);
         ((RecipesApplication) getApplication()).getComponent().inject(this);
         recipesListPresenter.setView(this);
@@ -47,7 +51,7 @@ public class RecipesListActivity extends BaseActivity implements RecipesListView
 
     @Override
     public void onErrorDownloadRecipesList() {
-        showError(restaurantListContainer);
+        getRecipesFromDB();
         hideWaitDialog();
     }
 
@@ -57,28 +61,49 @@ public class RecipesListActivity extends BaseActivity implements RecipesListView
         hideWaitDialog();
     }
 
+    private void addFilterListener() {
+        filterRecipes.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                recipesListAdapter.filter(newText);
+                return false;
+            }
+        });
+    }
     private void getRecipes() {
         if (isNetworkAvailable()) {
             waitDialog.show();
             recipesListPresenter.getRecipes();
         } else {
-            recipesList = recipesListPresenter.recipesFromDB();
-            if (recipesList.size() > 0) {
-                setRecipesListAdapter(recipesList);
-            } else if (!isNetworkAvailable()) {
-                handleNoInternetState(restaurantListContainer);
-            } else {
-                showError(restaurantListContainer);
-            }
+            getRecipesFromDB();
         }
     }
+
+    private void getRecipesFromDB() {
+        recipesList = recipesListPresenter.recipesFromDB();
+        if (recipesList.size() > 0) {
+            setRecipesListAdapter(recipesList);
+        } else if (!isNetworkAvailable()) {
+            handleNoInternetState(restaurantListContainer);
+        } else {
+            showError(restaurantListContainer);
+        }
+    }
+
 
     private void setRecipesListAdapter(List<Recipes> recipesList) {
         LinearLayoutManager layoutManager
                 = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
-        restaurantsRecycler.setLayoutManager(layoutManager);
-        RecipesListAdapter restaurantListAdapter = new RecipesListAdapter(this, recipesList);
-        restaurantsRecycler.setAdapter(restaurantListAdapter);
+        recipeRecycleView.setLayoutManager(layoutManager);
+        recipesListAdapter = new RecipesListAdapter(this, recipesList);
+        recipeRecycleView.setAdapter(recipesListAdapter);
+        addFilterListener();
     }
 
 

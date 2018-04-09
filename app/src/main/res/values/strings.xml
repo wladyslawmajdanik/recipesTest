@@ -4,4 +4,5 @@
     <string name="no_internet_connection">No internet connection</string>
     <string name="error_occurred">Error occurred</string>
     <string name="ok">OK</string>
+    <string name="type_keyword">Type your keyword here</string>
 </resources>

@@ -1,6 +1,8 @@
 package schibsted.recipestest.ui.activities.recipeslist;
 
 
+import android.util.Log;
+
 import java.util.List;
 
 import io.reactivex.Observable;
@@ -57,8 +59,7 @@ public class RecipesListPresenterImpl implements RecipesListPresenter, Presenter
     }
 
     private Observable<List<Recipes>> getRecipesObservable() {
-//"","thumbnail-medium","1",
-        return remoteRepository.getRecipes(5, 2)
+        return remoteRepository.getRecipes()
                 .subscribeOn(Schedulers.io());
     }
 
@@ -69,6 +70,7 @@ public class RecipesListPresenterImpl implements RecipesListPresenter, Presenter
     private void onGetRecipesError(Throwable throwable) {
         view.onErrorDownloadRecipesList();
         Timber.e(throwable);
+        Log.e("ERROR", throwable + "");
     }
 
 

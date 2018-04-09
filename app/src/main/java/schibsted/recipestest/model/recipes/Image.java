@@ -17,7 +17,7 @@ public class Image extends RealmObject implements Serializable, Parcelable {
     private String imboId;
     @SerializedName("url")
     @Expose
-    private String url="";
+    private String url = "";
     public final static Creator<Image> CREATOR = new Creator<Image>() {
 
 

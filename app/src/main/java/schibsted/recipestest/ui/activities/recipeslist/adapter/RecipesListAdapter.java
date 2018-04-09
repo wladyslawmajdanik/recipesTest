@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -26,11 +27,12 @@ public class RecipesListAdapter extends RecyclerView.Adapter<RecipesListAdapter.
     private LayoutInflater layoutInflater;
     private Activity activity;
     private List<Recipes> recipesList;
-
+    private List<Recipes> itemsCopy = new ArrayList<>();
     public RecipesListAdapter(Activity activity, List<Recipes> recipesList) {
         this.activity = activity;
         this.layoutInflater = activity.getLayoutInflater();
         this.recipesList = recipesList;
+        itemsCopy.addAll(recipesList);
     }
 
     @Override
@@ -45,11 +47,13 @@ public class RecipesListAdapter extends RecyclerView.Adapter<RecipesListAdapter.
     public void onBindViewHolder(final OrderTabViewHolder viewHolder, int i) {
         viewHolder.restaurantName.setText(recipesList.get(i).getTitle());
 
-         try {
-             Glide.with(activity)
-                     .load(recipesList.get(i).getImages().get(0).getUrl())
-                     .into(viewHolder.restaurantImage);
-         }catch (Exception e){e.printStackTrace();}
+        try {
+            Glide.with(activity)
+                    .load(recipesList.get(i).getImages().get(0).getUrl())
+                    .into(viewHolder.restaurantImage);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         viewHolder.cardView.setOnClickListener(v ->
                 activity.startActivity(new Intent(activity, RecipeDetailsActivity.class).putExtra(RECIPES_DATA, recipesList.get(i))));
@@ -75,6 +79,29 @@ public class RecipesListAdapter extends RecyclerView.Adapter<RecipesListAdapter.
         }
     }
 
+
+    public void filter(String text) {
+        recipesList.clear();
+        if (text.isEmpty()) {
+            recipesList.addAll(itemsCopy);
+        } else {
+            text = text.toLowerCase();
+            for (Recipes item : itemsCopy) {
+                if (item.getTitle().toLowerCase().contains(text)
+                        ) {
+                    recipesList.add(item);
+                } else {
+                    for (int i = 0; i < item.getIngredients().size(); i++) {
+                        if (item.getIngredients().get(i).getName().toLowerCase().contains(text)) {
+                            recipesList.add(item);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        notifyDataSetChanged();
+    }
 
 }
 

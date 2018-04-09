@@ -67,9 +67,7 @@ public class Recipes extends RealmObject implements Parcelable {
     @SerializedName("images")
     @Expose
     private RealmList<Image> images = new RealmList<>();
-    @SerializedName("links")
-    @Expose
-    private String links;
+
     public final static Creator<Recipes> CREATOR = new Creator<Recipes>() {
 
 
@@ -106,7 +104,7 @@ public class Recipes extends RealmObject implements Parcelable {
         in.readList(this.tags, (Tag.class.getClassLoader()));
         in.readList(this.steps, (Step.class.getClassLoader()));
         in.readList(this.images, (Image.class.getClassLoader()));
-        this.links = ((String) in.readValue((String.class.getClassLoader())));
+
     }
 
     public Recipes() {
@@ -256,13 +254,6 @@ public class Recipes extends RealmObject implements Parcelable {
         this.images = images;
     }
 
-    public String getLinks() {
-        return links;
-    }
-
-    public void setLinks(String links) {
-        this.links = links;
-    }
 
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeValue(title);
@@ -283,7 +274,6 @@ public class Recipes extends RealmObject implements Parcelable {
         dest.writeList(tags);
         dest.writeList(steps);
         dest.writeList(images);
-        dest.writeValue(links);
     }
 
     public int describeContents() {
